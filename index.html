@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Ansible-container Intro</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/solarized.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<link rel="stylesheet" href="css/style.css">
+
+		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- Printing and PDF exports -->
+		<script>
+var link = document.createElement( 'link' );
+link.rel = 'stylesheet';
+link.type = 'text/css';
+link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<section>
+					<h2>Ansible Container</h2>
+					<ul>
+						<li class="fragment">Manages lifecycle of an application.
+							<ul>
+								<li>From development to deployment in cloud.</li>
+							</ul>
+						</li>
+						<li class="fragment">Leverages Ansible roles from <a href="https://galaxy.ansible.com/">Ansible Galaxy</a>.</li>
+						<li class="fragment">Uses containers.</li>
+						<li class="fragment">Container recipe is the Ansible language (not Dockerfile).</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Glossary (filesystem structure)</h2>
+					<code class="fragment"><pre>
+ansible
+├── container.yml
+├── main.retry
+├── main.yml
+└── requirements.txt</pre></code>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Glossary (main.yml)</h2>
+					<code class="fragment"><pre>
+- hosts: django
+  roles:
+  - django-gunicorn
+
+- hosts: nginx
+  roles:
+  - role: ansible.nginx-container
+    ASSET_PATHS:
+    - /tmp/static
+    PROXY: yes
+    PROXY_PASS: http://django:8080
+    PROXY_LOCATION: "~* /(admin|api)"</pre></code>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Glossary (container.yml)</h2>
+					<code class="fragment"><pre>
+version: '2'
+defaults:
+  POSTGRES_USER: django
+  POSTGRES_PASSWORD: sesame
+  POSTGRES_DB: django
+  DJANGO_USER: django
+  DJANGO_PORT: 8080
+services:</pre></code>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Glossary (container.yml) II</h2>
+					<code class="fragment"><pre>
+services:
+  django:
+    image: centos:7
+    environment:
+      DATABASE_URL: pgsql://{{ POSTGRES_USER }}:{{ ...
+    expose:
+    - '{{ DJANGO_PORT }}'
+    links:
+    - postgresql
+    user: '{{ DJANGO_USER }}'
+    command: ['/usr/bin/dumb-init', '/bin/gunicorn...
+    dev_overrides:
+      command: [/usr/bin/dumb-init, '/bin/python', manage...
+        '0.0.0.0:{{ DJANGO_PORT }}']
+      volumes:
+      - $PWD:{{ DJANGO_ROOT }}
+      depends_on:
+      - postgresql</pre></code>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Glossary (container.yml) III</h2>
+					<code class="fragment"><pre>
+  nginx:
+    image: centos:7
+    ports:
+    - {{ DJANGO_PORT }}:8000 
+    user: nginx
+    links:
+    - django
+    command: ['/usr/bin/dumb-init', 'nginx', '-c', '/etc/ng...
+    dev_overrides:
+      ports: []
+      command: /bin/false</pre></code>
+					<aside class="notes">
+						<ul>
+							<li></li>
+						</ul>
+					</aside>
+				</section>
+				<section>
+
+					<h2>Demo</h2>
+					<ul>
+						<li><span class="fa fa-github-square"></span> ansible/ansible-container-demo</li>
+						<li><span class="fa fa-youtube-square"></span> <a href="https://youtu.be/1Qv2GeSjyiY">Init</a></li>
+						<li><span class="fa fa-youtube-square"></span> <a href="https://youtu.be/xnzrNWHzFWY">Build</a></li>
+						<li><span class="fa fa-youtube-square"></span> <a href="https://youtu.be/XVOIVhcYd8M">Run</a></li>
+						<li><span class="fa fa-youtube-square"></span> <a href="https://youtu.be/4a8WKO5Kjlo">Shipit</a></li>
+						<li><span class="fa fa-youtube-square"></span> <a href="https://youtu.be/9i6iGMLyr44">Deploy</a></li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Distribution, company</li>
+							<li>Support, up to date content, CVEs</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Future steps</h2>
+					<ul>
+						<li class="fragment"><a href="https://github.com/ansible/ansible-container/blob/refactor/mk-ii/proposals/mk-ii.md">Big rewrite is coming</a>:
+							<ul>
+								<li class="fragment">Conductor container.</li>
+								<li class="fragment">Injecting runtime environment (virtualenv) into provisioned container image.</li>
+								<li class="fragment"><code>main.yml</code> is gone.</li>
+								<li class="fragment"><code>container.yml</code> now has only base image and list of Ansible roles.</li>
+								<li class="fragment">Dockerfile → "ansible-container project" convertor.</li>
+							</ul>
+						</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Distribution, company</li>
+							<li>Support, up to date content, CVEs</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Questions are welcome!</h2>
+					<ul style="list-style-type: none;">
+						<li><span class="fa fa-github-square"></span> TomasTomecek/ansible-container-talk</li>
+						<li><span class="fa fa-github-square"></span> ansible/ansible-container-demo</li>
+						<li><span class="fa fa-github-square"></span> ansible/ansible-container</li>
+						<li><span class="fa fa-twitter-square"></span> @TomasTomec</li>
+					</ul>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+// More info https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+	history: true,
+	slideNumber: true,
+	transition: 'none',
+
+	// More info https://github.com/hakimel/reveal.js#dependencies
+	dependencies: [
+		{ src: 'plugin/markdown/marked.js' },
+		{ src: 'plugin/markdown/markdown.js' },
+		{ src: 'plugin/notes/notes.js', async: true },
+		{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+	]
+});
+		</script>
+	</body>
+</html>
