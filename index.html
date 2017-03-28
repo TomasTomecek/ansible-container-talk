@@ -43,6 +43,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 						<li class="fragment">This guy</li>
 						<li class="fragment"><strike>Ops</strike> Engineer</li>
 						<li class="fragment">* project contributor</li>
+						<li class="fragment">Redhatter</li>
 						<li class="fragment">Container fanboy</li>
 					</ul>
 				</section>
@@ -50,8 +51,23 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 				<section>
 					<h2>Ansible</h2>
 					<ul>
-						<li></li>
-						<li></li>
+						<li class="fragment">Agentless automation system.</li>
+						<li class="fragment">Config-management, application deployment, ...</li>
+						<li class="fragment">Simplicity.</li>
+						<li class="fragment">Easy to write.</li>
+						<li class="fragment">Great documentation.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Ansible II</h2>
+					<ul>
+						<li class="fragment">Modules.</li>
+						<li class="fragment">Tasks.</li>
+						<li class="fragment">Plays.</li>
+						<li class="fragment">Playbooks.</li>
+						<li class="fragment">Roles.</li>
+						<li class="fragment">Variables.</li>
 					</ul>
 				</section>
 
@@ -59,11 +75,11 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 					<h2>Containers</h2>
 					<ul>
 						<li>Isolated processes which...</li>
-						<li class="fragment" data-fragment-index="1">Nope</li>
+						<li class="fragment" data-fragment-index="1">Oh, wait.</li>
 						<li class="fragment" data-fragment-index="2">You</li>
 						<li class="fragment" data-fragment-index="2">Already</li>
 						<li class="fragment" data-fragment-index="2">Know</li>
-						<li class="fragment" data-fragment-index="2">That</li>
+						<li class="fragment" data-fragment-index="2">This</li>
 						<li class="fragment" data-fragment-index="3">Right?</li>
 					</ul>
 				</section>
@@ -89,7 +105,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 
 				<section>
 					<h2>Glossary (filesystem structure)</h2>
-					<code class="fragment"><pre>
+					<code><pre>
 ansible
 ├── container.yml
 ├── main.retry
@@ -104,7 +120,7 @@ ansible
 
 				<section>
 					<h2>Glossary (main.yml)</h2>
-					<code class="fragment"><pre>
+					<code><pre>
 - hosts: django
   roles:
   - django-gunicorn
@@ -126,7 +142,7 @@ ansible
 
 				<section>
 					<h2>Glossary (container.yml)</h2>
-					<code class="fragment"><pre>
+					<code><pre>
 version: '2'
 defaults:
   POSTGRES_USER: django
@@ -144,7 +160,7 @@ services:</pre></code>
 
 				<section>
 					<h2>Glossary (container.yml) II</h2>
-					<code class="fragment"><pre>
+					<code><pre>
 services:
   django:
     image: centos:7
@@ -172,7 +188,7 @@ services:
 
 				<section>
 					<h2>Glossary (container.yml) III</h2>
-					<code class="fragment"><pre>
+					<code><pre>
   nginx:
     image: centos:7
     ports:
